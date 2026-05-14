@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() {
-      _isLoading = true;
+      _isLoading = true
     });
 
     try {
