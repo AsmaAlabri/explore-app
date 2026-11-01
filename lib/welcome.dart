@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/app_strings.dart';
 import 'login.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -24,8 +25,8 @@ class WelcomePage extends StatelessWidget {
 
               const Spacer(),
 
-              const Text(
-                "JOIN US AND\nEXPLORE OMAN",
+              Text(
+                tr('join_explore_oman'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -60,8 +61,8 @@ class WelcomePage extends StatelessWidget {
                       );
                     },
 
-                    child: const Text(
-                      "GET STARTED!",
+                    child: Text(
+                      tr('get_started'),
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,

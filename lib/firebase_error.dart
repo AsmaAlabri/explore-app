@@ -1,3 +1,4 @@
+import 'l10n/app_strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -5,46 +6,46 @@ String firebaseErrorMessage(Object error) {
   if (error is FirebaseAuthException) {
     switch (error.code) {
       case 'email-already-in-use':
-        return 'This email is already registered.';
+        return tr('a_err_email_registered');
       case 'invalid-email':
-        return 'Please enter a valid email address.';
+        return tr('a_err_valid_email');
       case 'invalid-credential':
       case 'user-not-found':
       case 'wrong-password':
-        return 'Invalid email or password.';
+        return tr('a_err_invalid_credentials');
       case 'weak-password':
-        return 'Please choose a stronger password.';
+        return tr('a_err_stronger_password');
       case 'user-disabled':
-        return 'This account has been disabled.';
+        return tr('a_err_account_disabled');
       case 'network-request-failed':
-        return 'Network error. Check your connection and try again.';
+        return tr('a_err_network');
       case 'too-many-requests':
-        return 'Too many attempts. Please try again later.';
+        return tr('a_err_too_many');
       case 'requires-recent-login':
-        return 'Please log in again before changing your password.';
+        return tr('a_err_recent_login');
       case 'operation-not-allowed':
-        return 'Email/password sign-in is not enabled in Firebase.';
+        return tr('a_err_op_not_allowed');
       case 'unauthorized-domain':
-        return 'This website is not allowed in Firebase Authentication settings.';
+        return tr('a_err_unauth_domain');
       case 'configuration-not-found':
-        return 'Firebase Authentication is not configured for this app.';
+        return tr('a_err_config_not_found');
       case 'role-mismatch':
-        return error.message ?? 'This account is not registered for that role.';
+        return error.message ?? tr('a_err_role_mismatch');
       default:
-        return error.message ?? 'Firebase authentication failed.';
+        return error.message ?? tr('a_err_auth_failed');
     }
   }
 
   if (error is FirebaseException) {
     switch (error.code) {
       case 'permission-denied':
-        return 'You do not have permission to access this data.';
+        return tr('a_err_permission');
       case 'network-request-failed':
-        return 'Network error. Check your connection and try again.';
+        return tr('a_err_network');
       default:
-        return error.message ?? 'Firebase request failed.';
+        return error.message ?? tr('a_err_request_failed');
     }
   }
 
-  return 'Something went wrong. Please try again.';
+  return tr('a_err_generic');
 }

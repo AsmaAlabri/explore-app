@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_error.dart';
+import 'l10n/app_strings.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -36,8 +37,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     if (user == null || user.email == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please log in again to change your password"),
+        SnackBar(
+          content: Text(tr('login_again_message')),
         ),
       );
       return;
@@ -64,18 +65,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       newPasswordController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password Updated Successfully"),
-        ),
+        SnackBar(content: Text(tr('password_updated_success'))),
       );
     } catch (error) {
       if (!mounted) {
         return;
       }
 
+      final isWrongOldPassword = error is FirebaseAuthException &&
+          (error.code == 'wrong-password' ||
+              error.code == 'invalid-credential' ||
+              error.code == 'user-not-found');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(firebaseErrorMessage(error)),
+          content: Text(
+            isWrongOldPassword
+                ? tr('err_incorrect_old_password')
+                : firebaseErrorMessage(error),
+          ),
         ),
       );
     } finally {
@@ -95,21 +103,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: _isLoading ? null : () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Reset Password",
-        ),
+        title: Text(tr('reset_password_title')),
         backgroundColor: Colors.brown,
       ),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/bg.jpg',
-            fit: BoxFit.cover,
-          ),
-          Container(
-            color: Colors.black54,
-          ),
+          Image.asset('assets/bg.jpg', fit: BoxFit.cover),
+          Container(color: Colors.black54),
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -120,9 +121,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     children: [
                       const SizedBox(height: 40),
 
-                      const Text(
-                        "Reset Your Password",
-                        style: TextStyle(
+                      Text(
+                        tr('reset_your_password_heading'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -136,7 +137,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         obscureText: obscureOld,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          hintText: "Old Password",
+                          hintText: tr('old_password_hint'),
                           hintStyle: const TextStyle(color: Colors.white70),
                           filled: true,
                           fillColor: Colors.white24,
@@ -159,7 +160,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Enter old password";
+                            return tr('err_enter_old_password');
                           }
 
                           return null;
@@ -173,7 +174,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         obscureText: obscureNew,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          hintText: "New Password",
+                          hintText: tr('new_password_hint'),
                           hintStyle: const TextStyle(color: Colors.white70),
                           filled: true,
                           fillColor: Colors.white24,
@@ -196,7 +197,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Enter new password";
+                            return tr('err_enter_new_password');
+                          }
+
+                          if (value == oldPasswordController.text) {
+                            return tr('err_new_password_same');
                           }
 
                           final strongPassword = RegExp(
@@ -204,7 +209,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           );
 
                           if (!strongPassword.hasMatch(value)) {
-                            return "Weak password";
+                            return tr('err_weak_password');
                           }
 
                           return null;
@@ -221,17 +226,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             backgroundColor: Colors.brown,
                           ),
                           onPressed: _isLoading ? null : _changePassword,
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  "Reset Password",
-                                ),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : Text(tr('reset_password_title')),
                         ),
                       ),
                     ],

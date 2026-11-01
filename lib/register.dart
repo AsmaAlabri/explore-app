@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_error.dart';
+import 'l10n/app_strings.dart';
 import 'login.dart';
 import 'user_roles.dart';
 
@@ -95,8 +96,8 @@ class _RegisterPageState extends State<RegisterPage> {
         SnackBar(
           content: Text(
             profileSaveError == null
-                ? "Registration successful. Please log in."
-                : "Registration successful, but profile details were not saved.",
+                ? tr('register_success')
+                : tr('register_success_profile_fail'),
           ),
         ),
       );
@@ -157,9 +158,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const SizedBox(height: 40),
 
-                    const Text(
-                      "Create Account",
-                      style: TextStyle(
+                    Text(
+                      tr('create_account'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -172,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: nameController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Full Name",
+                        hintText: tr('full_name_hint'),
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white24,
@@ -182,11 +183,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Please enter your name";
+                          return tr('err_enter_name');
                         }
 
                         if (value.trim().length < 3) {
-                          return "Name must be at least 3 characters";
+                          return tr('err_name_min_3');
                         }
 
                         return null;
@@ -200,7 +201,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       keyboardType: TextInputType.emailAddress,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Email",
+                        hintText: tr('email_hint'),
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white24,
@@ -210,7 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Please enter email";
+                          return tr('err_enter_email');
                         }
 
                         final emailRegExp = RegExp(
@@ -218,7 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         );
 
                         if (!emailRegExp.hasMatch(value.trim())) {
-                          return "Enter valid email";
+                          return tr('err_enter_valid_email');
                         }
 
                         return null;
@@ -232,7 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: _obscurePassword,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Password",
+                        hintText: tr('password_hint'),
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white24,
@@ -255,16 +256,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Please enter password";
+                          return tr('err_enter_password');
                         }
 
                         if (!isStrongPassword(value)) {
-                          return "Password must contain:\n"
-                              "- 8 characters\n"
-                              "- Uppercase letter\n"
-                              "- Lowercase letter\n"
-                              "- Number\n"
-                              "- Special character";
+                          return tr('err_password_strength');
                         }
 
                         return null;
@@ -278,7 +274,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: _obscureConfirmPassword,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Confirm Password",
+                        hintText: tr('confirm_password_hint'),
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white24,
@@ -302,11 +298,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Please confirm password";
+                          return tr('err_confirm_password');
                         }
 
                         if (value != passwordController.text) {
-                          return "Passwords do not match";
+                          return tr('err_passwords_mismatch');
                         }
 
                         return null;
@@ -315,46 +311,49 @@ class _RegisterPageState extends State<RegisterPage> {
 
                     const SizedBox(height: 20),
 
-                    DropdownButtonFormField<String>(
-                      value: _selectedRole,
-                      dropdownColor: Colors.brown[700],
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: "Role",
-                        hintStyle: const TextStyle(color: Colors.white70),
-                        filled: true,
-                        fillColor: Colors.white24,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    Text(
+                      tr('role_selection_label'),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
                       ),
-                      items: userRoles.entries
-                          .map(
-                            (entry) => DropdownMenuItem<String>(
-                              value: entry.key,
-                              child: Text(entry.value),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: _isLoading
-                          ? null
-                          : (value) {
-                              if (value == null) {
-                                return;
-                              }
+                    ),
 
-                              setState(() {
-                                _selectedRole = value;
-                              });
-                            },
+                    const SizedBox(height: 8),
+
+                    Row(
+                      children: registrableUserRoles.keys.map((roleKey) {
+                        final selected = _selectedRole == roleKey;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                            ),
+                            child: _RoleOption(
+                              label: roleLabelTr(roleKey),
+                              icon: roleKey == 'tourist'
+                                  ? Icons.travel_explore
+                                  : Icons.storefront,
+                              selected: selected,
+                              onTap: _isLoading
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _selectedRole = roleKey;
+                                      });
+                                    },
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
 
                     const SizedBox(height: 15),
 
-                    const Text(
-                      "Password must contain uppercase, lowercase,\nnumber and special character",
+                    Text(
+                      tr('password_requirements_hint'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
                       ),
@@ -378,9 +377,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                "Register",
-                                style: TextStyle(
+                            : Text(
+                                tr('register_button'),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -394,9 +393,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Already have an account? ",
-                          style: TextStyle(color: Colors.white),
+                        Text(
+                          tr('already_have_account'),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         GestureDetector(
                           onTap: _isLoading
@@ -409,9 +408,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   );
                                 },
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(
+                          child: Text(
+                            tr('login_button'),
+                            style: const TextStyle(
                               color: Colors.amber,
                               fontWeight: FontWeight.bold,
                             ),
@@ -438,6 +437,54 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// One half of the Tourist / Local Business Owner toggle shown on
+/// the registration page.
+class _RoleOption extends StatelessWidget {
+  const _RoleOption({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? Colors.brown[400] : Colors.white24,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 22),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight:
+                      selected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

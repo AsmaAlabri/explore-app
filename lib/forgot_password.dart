@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_error.dart';
+import 'l10n/app_strings.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -41,8 +42,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password reset link sent to your email"),
+        SnackBar(
+          content: Text(tr('reset_link_sent')),
         ),
       );
 
@@ -87,9 +88,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 70),
-                    const Text(
-                      "Forgot Password",
-                      style: TextStyle(
+                    Text(
+                      tr('forgot_password_title'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       keyboardType: TextInputType.emailAddress,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Email",
+                        hintText: tr('email_hint'),
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white24,
@@ -111,11 +112,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Please enter email";
+                          return tr('err_enter_email');
                         }
 
                         if (!value.trim().contains("@")) {
-                          return "Invalid email";
+                          return tr('err_invalid_email');
                         }
 
                         return null;
@@ -138,9 +139,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                "Send Reset Link",
-                                style: TextStyle(
+                            : Text(
+                                tr('send_reset_link'),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -151,9 +152,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     const SizedBox(height: 16),
                     TextButton(
                       onPressed: _isLoading ? null : () => Navigator.pop(context),
-                      child: const Text(
-                        "Back to Login",
-                        style: TextStyle(color: Colors.amber),
+                      child: Text(
+                        tr('back_to_login'),
+                        style: const TextStyle(color: Colors.amber),
                       ),
                     ),
                   ],

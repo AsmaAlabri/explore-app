@@ -1,244 +1,96 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'welcome.dart';
-import 'profile.dart';
 
-class HomePage extends StatefulWidget {
+import 'app_settings.dart';
+import 'l10n/app_strings.dart';
+import 'widgets/app_drawer.dart';
+import 'widgets/app_scaffold.dart';
+
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
-  Future<void> logout() async {
-    await FirebaseAuth.instance.signOut();
-
-    if (!mounted) {
-      return;
-    }
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WelcomePage(),
-      ),
-      (route) => false,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      drawer: Drawer(
-        child: Stack(
-          children: [
-            SizedBox.expand(
-              child: Image.asset(
+    // Rebuild this page whenever the language or theme changes, so
+    // its text and colors stay in sync even though it isn't the page
+    // where the toggle lives (that's Profile & Settings).
+    return ListenableBuilder(
+      listenable: AppSettings.instance,
+      builder: (context, _) {
+        return Scaffold(
+          drawer: AppNavigationDrawer(),
+          appBar: null,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
                 'assets/bg.jpg',
                 fit: BoxFit.cover,
               ),
-            ),
 
-            Container(
-              color: Colors.white.withOpacity(0.85),
-            ),
+              Container(
+                color: Colors.black.withOpacity(0.35),
+              ),
 
-            ListView(
-              padding: EdgeInsets.zero,
-
-              children: [
-
-                const DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                  ),
-
-                  child: Align(
-                    alignment: Alignment.topLeft,
-
-                    child: Icon(
-                      Icons.menu,
-                      size: 35,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-
-                drawerItem(
-                  icon: Icons.home,
-                  title: "Home",
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-
-                drawerItem(
-                  icon: Icons.music_note,
-                  title: "About Oman",
-                  onTap: () => showComingSoon("About Oman"),
-                ),
-
-                drawerItem(
-                  icon: Icons.explore,
-                  title: "Explore",
-                  onTap: () => showComingSoon("Explore"),
-                ),
-
-                drawerItem(
-                  icon: Icons.event,
-                  title: "Events",
-                  onTap: () => showComingSoon("Events"),
-                ),
-
-                drawerItem(
-                  icon: Icons.notifications,
-                  title: "Notifications",
-                  onTap: () => showComingSoon("Notifications"),
-                ),
-
-                ListTile(
-                  leading: const Icon(
-                    Icons.person,
-                    color: Colors.brown,
-                  ),
-
-                  title: const Text(
-                    "Profile & Settings",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  onTap: () {
-                    Navigator.pop(context);
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const ProfilePage(),
+              SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white, size: 30),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                        ),
                       ),
-                    );
-                  },
-                ),
 
-                drawerItem(
-                  icon: Icons.help,
-                  title: "Help & Support",
-                  onTap: () => showComingSoon("Help & Support"),
-                ),
+                      const SizedBox(height: 12),
 
-                drawerItem(
-                  icon: Icons.info,
-                  title: "About us",
-                  onTap: () => showComingSoon("About us"),
-                ),
+                      Center(
+                        child: Text(
+                          tr('welcome_title'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
 
-                const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                ListTile(
-                  leading: const Icon(
-                    Icons.logout,
-                    color: Colors.red,
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: context.cardSurfaceColor,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          tr('home_intro'),
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            height: 1.5,
+                            color: context.primaryTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-
-                  title: const Text(
-                    "Logout",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  onTap: logout,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-
-      appBar: AppBar(
-        backgroundColor: Colors.brown,
-        title: const Text("Explore Oman"),
-        centerTitle: true,
-      ),
-
-      body: Stack(
-        fit: StackFit.expand,
-
-        children: [
-
-          Image.asset(
-            'assets/bg.jpg',
-            fit: BoxFit.cover,
-          ),
-
-          Container(
-            color: Colors.black.withOpacity(0.4),
-          ),
-
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-
-              child: Text(
-                "Welcome to Oman Culture Exploration App",
-                textAlign: TextAlign.center,
-
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
-  }
-
-  Widget drawerItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: Colors.brown,
-      ),
-
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-
-      onTap: onTap,
-    );
-  }
-
-  void showComingSoon(String pageName) {
-    Navigator.pop(context);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("$pageName page coming soon"),
-        ),
-      );
-    });
   }
 }

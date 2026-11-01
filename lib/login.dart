@@ -2,11 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
+import 'admin_home.dart';
 import 'firebase_error.dart';
 import 'forgot_password.dart';
 import 'home.dart';
+import 'l10n/app_strings.dart';
 import 'register.dart';
-import 'user_roles.dart';
 import 'welcome.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +23,6 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  String _selectedRole = defaultUserRole;
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -57,18 +57,21 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
 
-      final snapshot = await FirebaseDatabase.instance
-          .ref('users/${user.uid}/role')
-          .get();
-      final savedRole = snapshot.value?.toString() ?? defaultUserRole;
+      if (!mounted) {
+        return;
+      }
 
-      if (savedRole != _selectedRole) {
-        await FirebaseAuth.instance.signOut();
-        throw FirebaseAuthException(
-          code: 'role-mismatch',
-          message:
-              'This account is registered as ${roleLabel(savedRole)}, not ${roleLabel(_selectedRole)}.',
-        );
+      // Admin accounts go straight to the admin dashboard; everyone
+      // else goes to the normal Home page. The role is stored in the
+      // database under users/<uid>/role.
+      var isAdmin = false;
+      try {
+        final roleSnapshot = await FirebaseDatabase.instance
+            .ref('users/${user.uid}/role')
+            .get();
+        isAdmin = roleSnapshot.value?.toString() == 'admin';
+      } catch (_) {
+        isAdmin = false;
       }
 
       if (!mounted) {
@@ -78,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const HomePage(),
+          builder: (_) =>
+              isAdmin ? const AdminHomePage() : const HomePage(),
         ),
       );
     } catch (error) {
@@ -139,9 +143,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const SizedBox(height: 80),
 
-                      const Text(
-                        "Welcome Back",
-                        style: TextStyle(
+                      Text(
+                        tr('welcome_back'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -157,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
-                          hintText: "Email",
+                          hintText: tr('email_hint'),
                           hintStyle: const TextStyle(
                             color: Colors.white70,
                           ),
@@ -169,11 +173,11 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return "Please enter email";
+                            return tr('err_enter_email');
                           }
 
                           if (!value.contains("@")) {
-                            return "Invalid email";
+                            return tr('err_invalid_email');
                           }
 
                           return null;
@@ -189,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
-                          hintText: "Password",
+                          hintText: tr('password_hint'),
                           hintStyle: const TextStyle(
                             color: Colors.white70,
                           ),
@@ -214,51 +218,15 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter password";
+                            return tr('err_enter_password');
                           }
 
                           if (value.length < 8) {
-                            return "Minimum 8 characters";
+                            return tr('err_min_8_chars');
                           }
 
                           return null;
                         },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      DropdownButtonFormField<String>(
-                        value: _selectedRole,
-                        dropdownColor: Colors.brown[700],
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "Role",
-                          hintStyle: const TextStyle(color: Colors.white70),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        items: userRoles.entries
-                            .map(
-                              (entry) => DropdownMenuItem<String>(
-                                value: entry.key,
-                                child: Text(entry.value),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: _isLoading
-                            ? null
-                            : (value) {
-                                if (value == null) {
-                                  return;
-                                }
-
-                                setState(() {
-                                  _selectedRole = value;
-                                });
-                              },
                       ),
 
                       const SizedBox(height: 30),
@@ -279,9 +247,9 @@ class _LoginPageState extends State<LoginPage> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Text(
-                                  "Login",
-                                  style: TextStyle(
+                              : Text(
+                                  tr('login_button'),
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -306,9 +274,9 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     );
                                   },
-                            child: const Text(
-                              "Register",
-                              style: TextStyle(
+                            child: Text(
+                              tr('register_link'),
+                              style: const TextStyle(
                                 color: Colors.amber,
                               ),
                             ),
@@ -325,9 +293,9 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     );
                                   },
-                            child: const Text(
-                              "Forgot Password",
-                              style: TextStyle(
+                            child: Text(
+                              tr('forgot_password_link'),
+                              style: const TextStyle(
                                 color: Colors.amber,
                               ),
                             ),
