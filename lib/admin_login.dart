@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'admin_home.dart';
 import 'firebase_error.dart';
 import 'user_roles.dart';
-import 'l10n/app_strings.dart';
+import 'l10n/app_strings.dart';.
 
 /// A separate, deliberately plain login screen just for admin
 /// accounts. There is no "Admin" option on the public Register page —
