@@ -5,7 +5,7 @@ import 'l10n/app_strings.dart';
 import 'widgets/app_scaffold.dart';
 
 class AboutOmanPage extends StatelessWidget {
-  const AboutOmanPage({uper.key});
+  const AboutOmanPage({super.key});
 
   @override
   Widget build(BuildContext context) {
